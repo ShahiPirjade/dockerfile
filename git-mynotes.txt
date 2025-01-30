@@ -1,0 +1,101 @@
+git checkout master
+git pull
+git checkout -b [sub branch name]
+git status // shows which branch you are in 
+git diff // what changes you have made in your working directory
+git add // will state the working directory of staging area
+git commit -m "COMMENT"
+git push origin [JIRA ID]m
+lsof [filename] // shows 
+git branch -M FOLD_NAME // it creates and switches to the folder.
+
+################To remove untracked files in GIT################
+git clean -f <file> // to remove a single untracked file
+
+git clean -f //Remove all untracked files
+git clean -fd //Remove all untracked files and directory
+
+git clean -n // you might want to see what will be deleted by using '-n' option. This will show you a list of files and directories that would be removed without actually deleting them.
+
+
+################How to undo the commit pushed using git revert################
+check the $ git log // to check what all commit you did and the COMMIT ID for which you have accidentially commited it. Copy the commit id
+git revert <commit id> / id for which you want to undo the changes
+git push // revert the changes to the remote branch 
+
+
+############# reset the changes
+git log --online <Will give you all commit id, you can select the one till where you want the new commit to be updated.
+Example - file names.txt containes 1st commit - shahistha  <commit id1>
+2nd commit - sumaiya <commit id2>
+
+Now i want it to have only shahistha in the file as other changes were done by mistake. Now when you run [$git log --online] will HEAD it to 1 
+
+$ git reset <commit id> --hard 
+
+git-reset - Reset current HEAD to the specified state 
+
+git-reset --soft<commit> // Undo all the 
+git-reset --mixed<commit>
+git-reset --hard<commit>
+
+#################Git practise Technical Guftgu############
+I] Install latest GIT - https://git-scm.com/downloads/win
+We have installed 2.4
+Microsoft Windows [Version 10.0.22631.4317]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\pirja>git config --global user.name "shahistp"
+
+C:\Users\pirja>git config --global user.mail "pirjadeshahistha@gmail.com"
+git config --global user.email "pirjadeshahistha@gmail.com"
+C:\Users\pirja>git config --global --list
+user.name=shahistp
+user.mail=pirjadeshahistha@gmail.com
+
+II] Now install JDK  
+JDK PATH INSTALLED -C:\Program Files\Java\jdk-23
+Edit and add the environment variables
+Go to CMD type 
+C:\Users\pirja>echo %JAVA_HOME%
+C:\Program Files\Java\jdk-23 <= Output
+
+III] Now install maven
+extract it and keep the bin file in system variables and path
+
+mvn -version
+
+Maven home: C:\Users\pirja\Documents\Dev-Tools\apache-maven-3.9.9
+Java version: 23.0.1, vendor: Oracle Corporation, runtime: C:\Program Files\Java\jdk-23
+Default locale: en_US, platform encoding: UTF-8
+OS name: "windows 11", version: "10.0", arch: "amd64", family: "windows"
+
+#################VIDEOS###########33
+creating/modyfing files -> adding to staging area -> commiting to local repo -> pushing changes to central repo.
+
+git add . ; git commit -m "First Commit" ; git push origin master
+
+git branch BRANCH_NAME / To create a branch
+git checkout BRANCH_NAME / To move to a branch   #git checkout -b BRANCH_NAME // Creates and moves to the new branch
+git add . ;
+git commit -m "First Commit";
+git push origin master
+git log --online / u will see commit with feature branch
+
+
+-----------MERGE STATERGIES-------------
+MERGE COMMIT
+	All commits from this branch will be added to the base branch via merge commit.
+REBASE AND MERGE
+SQUASH
+ Combining all the featured branch and rebasing it to one. 
+ 
+git cherrypick
+git revert
+
+------- STRATERGIES ------
+We use master and feature branch. We are providing protection by minimum 2 approvals for PR.
+We do changes in feature -> Raise PR -> Get approval -> While merging we choose merge option[as it preserves history] as our 
+MERGING STRATERGIES
+
+In REBASE - history is not preserved and commit id is not changed. In our project they want to preserve the history. 
