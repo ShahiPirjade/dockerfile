@@ -1,0 +1,178 @@
+------VM-------
+64GB RAM , 10 TB HD
+logically dividing single physical server into multiple VM'server
+hypervisor --> oracle VM virtual vmware
+Hypervisor is used so that if our HOST OS is Windows we can run diff multiple OS. 
+------Container------
+Inside VM we can run multiple containers, so that we can improve resource utilization
+-----Installing Docker - 11min
+In AWS - Select Community AMI "Centos 8 DevOps Practise"
+t2.micro
+
+ssh into the instance now 
+Open google search engine -> centos 8 install docker - link
+
+$sudo su
+Step1 :  set up the Docker repository. 
+the yum-utils package (which provides the yum-config-manager utility) and set up the repository.
+$ sudo yum install -y yum-utils
+$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+// yum-config-manager // It's a useful tool for administrators to easily manage software sources on a system using the YUM package manager. 
+
+Step2 :  install and update Docker from the repository.
+$ sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+// This command installs Docker, but it doesn't start Docker. It also creates a docker group, however, 
+it doesn't add any users to the group by default.
+
+
+Step3 : Verify that the Docker Engine installation is successful by running the hello-world image.
+$ sudo docker run hello-world
+
+Step4 : Start Docker  
+$ sudo systemctl start docker
+
+$ sudo systemctl enable docker
+
+exit root now
+
+$ docker ps // will show permission denied.
+
+Error Resolution - while installing docker, docker group is created.
+Make sure to add the user to the "docker" group
+$ usermod -aG docker centos // logout and then login again. [docker is group, centos is id]
+
+image = VM
+AMI = Centos 8 + nodejs / java / python + some package libraries + application.
+
+Image is like complete suit/setup
+
+$ docker images // will list down the images in the server
+
+$ docker pull [#image-name]
+eg docker pull nginx
+eg docker pull nginx:perl // Will pull "perl" and "nginx"
+O/P=> latest: pulling from library/nginx. 
+docker.io/library/nginx:latest // here the docker.io is docker hub. docker-hub is a place where you have all images available.
+eg docker pull image-name:version --> download the image from docker hub
+
+IMAGE = STATIC
+CONTAINER = When you run images you get container | Running version of image
+eg Image = OS and container are laptops. You can run 10 laptops with same OS
+
+the bare minimum OS makes the container better than others
+
+
+$ docker create [#image-id]
+eg docker create 5q23XXXX  // this has created the container but not started,
+so you wont be able to see it when you do "docker ps"
+
+Output - ccss99XXXXXXXXXXXXXX = Container ID
+
+$ docker ps // list of RUNNING containers 
+$ docker ps -a // list down all container including running/stopped/exited/created
+
+$ docker start [container-id]
+$ docker ps (now you will see the conatiner)
+
+$ docker images rmi (removing/deleting the images)
+$ docker images -a -q (-a all, -q id's of images)
+$ docker rmi `docker images -a -q`(removing ALL the images)
+
+$ docker rm `docker ps -a -q //removing the containers
+$ docker rmi `docker images -a -q`//removing ALL the images, 1st it will list it and then remove it
+$ docker rmi [#image-id] // removes particular image
+Pull image + created container + started container
+docker-run = pull+create+start
+
+How to access a nginx or any docker application running in VM? Ans->Port forwarding.
+Every server/container has 0-65535 PORTS 
+So there will be 2 ports. one at the VM level and the other at the Container level. 
+So if any user is accessing container/application nginx. Ex - if a user hits an application 8081, 
+We can inform docker to forward the request to nginx(which runs on port 80).
+ 
+$ docker run -p <host-port>:<container-port> image                                                        [Interview Question - How do you do port forwarding?]
+eg. docker run -p 8081:80 <nginx-image>--> runs in forground and attaches to screen, we cant run anything, so therefore we need to detach it. 
+host-port can be anything but container-port will be fix                       
+container-port is inbuild in image, if you want to change you need to change it in the image.
+$ docker run -d -p 8081:80-->		[Interview Question - Detaches the screen and runs in background]
+
+$docker ps
+$ docker exec -it <container-id> bash									   [Interview Question - How you can login to the running container]
+root@<container> --> it means you are inside the container
+exit 
+$ cd /usr/share/nginx/html
+echo "Hello, Welcome to docker" > hello.html
+
+To access it you can -> ip/hello.html
+
+$ docker run -d --name [#NAME] -p 8081:80 nginx   // To update the name of the docker 
+
+nginx installed has the bare minimum OS 
+
+$ docker logs <container-id>
+bare minimum os will be there in the container so not all the commands will be running. only req package will be there.
+eg ping might not be there
+
+Docker does not have Load Balance, k8 does -- load bal is a disadv
+
+You can use a single OS to run 10 laptops. in similar manner you can run 10 containers in a single image. 
+
+How can i create my own image and others can use it. 
+-----------------------------------------
+Dockerfile --> Declarative way of creating your own custom images --> https://docs.docker.com/reference/dockerfile/
+
+
+How to build docker image
+--------------------------------------
+docker built -t image-name:version
+eg docker built -t from:v1
+
+$docker images
+\\ now you will see the image you built "from"
+-t = taging the image. If you dont give version it will take current
+
+Dockerfile 
+--------
+*FROM FOLDER*
+FROM centos:8  //While creating image you need to write which image you want.
+
+*RUN FOLDER*
+FROM centos:8
+RUN yum install nginx -y  // on top of base OS we are installing nginx 
+
+push the above changes from git and 
+
+docker build -t run:v1 . // 
+
+FROM --> to select base OS
+RUN --> to install or configure packages or image, inside base OS it will run at image creation. 
+		[Run is used to install or configure the packages.]
+CMD --> it is to run the container, it will run at container creation.  there will be only 1 CMD instruction in a Dockerfile. If you list more than 1 CMD then only the last CMD will take effect.
+		[It will execute at the time of docker run or container creation]
+		
+Docker hub we can use from here the base image. But in real time every organization will have their own repo eg -> Nexus
+
+
+Whenever something has changed in the docker file you need to build the image. 
+systemctl start nginx --> systemctl will not work.
+nginx -g daemonoff 
+installed catalogue --> 
+
+docker runs on linux not windows. 
+docker desktop -> run it in windows. in background this S/W run a linux server in windows
+
+
+ format of the Dockerfile:
+ The instruction is not case-sensitive. However, convention is for them to be UPPERCASE to distinguish them from arguments more easily.
+ 
+  A Dockerfile must begin with a FROM instruction. This may be after parser directives, comments, and globally scoped ARGs.
+  
+
+Questions.
+1. In your project what docker repository are you using? [tumhari khud ki project ki personal repo hai kya?]
+2. kitne images rehte hai tumhare VM mai in general? aur ye images jo hai agar find out karna hai toh through GUI kaise karte ho? koi UI hai jisme kaunse images kaha rehta 
+wo pata chale?
+3. Port forwarding mai container-port change kar sakte kya tum? if yes then kaise?, have you done done port forwarding abhi ke projects mai? 
+4. khud se ab tak kaunse aur kitne docker images and container banaye hai project mai?
+5. Jab container ke andar login marte toh root access milta.. but root access is not good right? toh real time mai bhi aise hota kya?
